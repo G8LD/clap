@@ -15,7 +15,7 @@ import { useLocalStorage } from "./(components)/useLocalStorage";
 import theme from "./theme";
 import { Film } from "./interface";
 
-const MAX_HISTORY = 12;
+const MAX_HISTORY = 30;
 
 function FilmPickerContent() {
   const router = useRouter();
