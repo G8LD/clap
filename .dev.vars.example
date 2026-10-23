@@ -1,0 +1,14 @@
+# Copy this file to `.dev.vars` for local development (never commit `.dev.vars`).
+
+# Next.js environment to use when loading `.env` files (OpenNext convention).
+NEXTJS_ENV=development
+
+# TMDB API bearer token (v4 "Read Access Token"). SECRET — never commit.
+# In production this is set via: npx wrangler secret put TMDB_TOKEN
+TMDB_TOKEN=
+
+# TMDB API base URL. MUST end with a trailing slash.
+TMDB_API_URL=https://api.themoviedb.org/3/
+
+# TMDB image base URL used to prefix poster_path.
+TMDB_IMAGE_URL=https://image.tmdb.org/t/p/w500

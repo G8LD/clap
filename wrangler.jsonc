@@ -1,0 +1,32 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "main": ".open-next/worker.js",
+  "name": "clap",
+  "compatibility_date": "2025-09-23",
+  "compatibility_flags": [
+    // Enable Node.js API (required by @opennextjs/cloudflare)
+    // https://developers.cloudflare.com/workers/configuration/compatibility-flags/#nodejs-compatibility-flag
+    "nodejs_compat",
+    // Only allow fetch() to reach public URLs (the TMDB proxy calls TMDB)
+    // https://developers.cloudflare.com/workers/configuration/compatibility-flags/#global-fetch-strictly-public
+    "global_fetch_strictly_public"
+  ],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      // Must match the "name" of this worker.
+      "service": "clap"
+    }
+  ],
+  "images": {
+    // Enable next/image optimization on Workers.
+    // https://opennext.js.org/cloudflare/howtos/image
+    "binding": "IMAGES"
+  }
+  // No r2_buckets: this app uses no ISR / revalidate, so no incremental cache
+  // is needed. This keeps the project on the Cloudflare Workers free tier.
+}
