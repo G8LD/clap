@@ -23,11 +23,11 @@ token. The token stays server-side inside the Route Handlers.
 
 | Route                          | TMDB calls                                                        |
 | ------------------------------ | ----------------------------------------------------------------- |
-| `GET /api/film-picker`         | `discover/movie` (x2) + `movie/{id}` + `movie/{id}/credits`       |
-| `GET /api/film-picker/genres`  | `genre/movie/list`                                                |
-| `GET /api/film-picker/countries` | `configuration/countries`                                       |
+| `GET /api/films`         | `discover/movie` (x2) + `movie/{id}` + `movie/{id}/credits`       |
+| `GET /api/films/genres`  | `genre/movie/list`                                                |
+| `GET /api/films/countries` | `configuration/countries`                                       |
 
-`GET /api/film-picker` accepts these query params: `with_genres`,
+`GET /api/films` accepts these query params: `with_genres`,
 `vote_average`, `release_year_min`, `release_year_max`, `runtime`,
 `with_origin_country`. Every TMDB discover query is always seeded with
 `vote_count.gte=400`.

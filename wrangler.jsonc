@@ -26,6 +26,12 @@
     // Enable next/image optimization on Workers.
     // https://opennext.js.org/cloudflare/howtos/image
     "binding": "IMAGES"
+  },
+  // Non-secret TMDB configuration. The secret TMDB_TOKEN is set separately via
+  // `npx wrangler secret put TMDB_TOKEN` (never committed).
+  "vars": {
+    "TMDB_API_URL": "https://api.themoviedb.org/3/",
+    "TMDB_IMAGE_URL": "https://image.tmdb.org/t/p/w500"
   }
   // No r2_buckets: this app uses no ISR / revalidate, so no incremental cache
   // is needed. This keeps the project on the Cloudflare Workers free tier.

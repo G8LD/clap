@@ -25,6 +25,7 @@ export interface Film {
   runtime: number;
   vote_count: number;
   vote_average: number;
+  trailer_key: string | null;
 }
 
 export interface Country {

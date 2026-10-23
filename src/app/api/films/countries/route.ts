@@ -4,7 +4,7 @@ import { fetchJson, getTmdbEnv } from "../tmdb";
 export const dynamic = "force-dynamic";
 
 /**
- * GET /api/film-picker/countries
+ * GET /api/films/countries
  *
  * Reproduces the Rust `get_countries`: calls `configuration/countries` and
  * returns the response as-is (an array of countries). Countries rarely change,
@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
  */
 export async function GET() {
   try {
-    const { token, apiUrl } = getTmdbEnv();
+    const { token, apiUrl } = await getTmdbEnv();
     const data = await fetchJson(`${apiUrl}configuration/countries`, token);
 
     return NextResponse.json(data, {

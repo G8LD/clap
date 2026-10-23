@@ -23,11 +23,25 @@ interface TmdbEnv {
  * - TMDB_TOKEN:     v4 bearer token (secret, set via `wrangler secret put`).
  * - TMDB_API_URL:   base URL, MUST end with a trailing slash (e.g. ".../3/").
  * - TMDB_IMAGE_URL: base URL used to prefix poster_path.
+ *
+ * Values are read from the Cloudflare context (which is backed by `.dev.vars`
+ * during `next dev`/`preview` and by secrets/vars in production), falling back
+ * to `process.env` so the code also works outside the Workers runtime.
  */
-export function getTmdbEnv(): TmdbEnv {
-  const token = process.env.TMDB_TOKEN;
-  const apiUrl = process.env.TMDB_API_URL;
-  const imageUrl = process.env.TMDB_IMAGE_URL;
+export async function getTmdbEnv(): Promise<TmdbEnv> {
+  let cfEnv: Record<string, string | undefined> = {};
+  try {
+    const { getCloudflareContext } = await import("@opennextjs/cloudflare");
+    const ctx = await getCloudflareContext({ async: true });
+    cfEnv = ctx.env as unknown as Record<string, string | undefined>;
+  } catch {
+    // Not running under the Cloudflare adapter (e.g. plain `next start`): fall
+    // back to process.env only.
+  }
+
+  const token = cfEnv.TMDB_TOKEN ?? process.env.TMDB_TOKEN;
+  const apiUrl = cfEnv.TMDB_API_URL ?? process.env.TMDB_API_URL;
+  const imageUrl = cfEnv.TMDB_IMAGE_URL ?? process.env.TMDB_IMAGE_URL;
 
   if (!token || !apiUrl || !imageUrl) {
     throw new Error(
@@ -103,4 +117,41 @@ export function filtersFromSearchParams(
     runtime: value("runtime"),
     with_origin_country: value("with_origin_country"),
   };
+}
+
+/**
+ * Fetch a single film by id with credits + videos, extract a YouTube trailer
+ * key, and prefix the poster path. Shared by the random-pick route and the
+ * fetch-by-id route.
+ */
+export async function fetchFilmById(
+  filmId: number,
+  env: TmdbEnv
+): Promise<Record<string, unknown>> {
+  const { token, apiUrl, imageUrl } = env;
+
+  const film = (await fetchJson(
+    `${apiUrl}movie/${filmId}?append_to_response=credits,videos`,
+    token
+  )) as Record<string, unknown>;
+
+  const videos = film["videos"] as
+    | { results?: Array<Record<string, unknown>> }
+    | undefined;
+  const clips = videos?.results ?? [];
+  const trailer =
+    clips.find(
+      (v) =>
+        v["site"] === "YouTube" && v["type"] === "Trailer" && v["official"]
+    ) ||
+    clips.find((v) => v["site"] === "YouTube" && v["type"] === "Trailer") ||
+    clips.find((v) => v["site"] === "YouTube");
+  film["trailer_key"] =
+    trailer && typeof trailer["key"] === "string" ? trailer["key"] : null;
+
+  if (typeof film["poster_path"] === "string") {
+    film["poster_path"] = `${imageUrl}${film["poster_path"]}`;
+  }
+
+  return film;
 }

@@ -4,7 +4,7 @@ import { fetchJson, getTmdbEnv } from "../tmdb";
 export const dynamic = "force-dynamic";
 
 /**
- * GET /api/film-picker/genres
+ * GET /api/films/genres
  *
  * Reproduces the Rust `get_genres`: calls `genre/movie/list` and returns the
  * `genres` array. Genres rarely change, so we allow edge/browser caching via a
@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
  */
 export async function GET() {
   try {
-    const { token, apiUrl } = getTmdbEnv();
+    const { token, apiUrl } = await getTmdbEnv();
     const data = (await fetchJson(`${apiUrl}genre/movie/list`, token)) as Record<
       string,
       unknown
